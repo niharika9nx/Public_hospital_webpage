@@ -1,0 +1,6 @@
+{
+  "name": "Community Healthcare Support Portal",
+  "description": "A modern and responsive healthcare support portal featuring service overview, appointment booking, volunteer registration, contact form, and an AI support assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
