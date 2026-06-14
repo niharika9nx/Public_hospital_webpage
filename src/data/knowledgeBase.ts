@@ -1,6 +1,6 @@
 export interface HospitalInfo {
   overview: string;
-  departments: { name: string; description: string; head: string }[];
+  departments: { name: string; description: string; head: string; image?: string }[];
   services: { name: string; description: string; icon: string }[];
   facilities: { name: string; description: string; location: string }[];
   workingHours: { days: string; hours: string; notes: string }[];
@@ -17,6 +17,13 @@ export interface HospitalInfo {
     webAddress: string;
     emergencyHotline: string;
   };
+  complaintInfo: {
+    department: string;
+    location: string;
+    email: string;
+    phone: string;
+    procedure: string;
+  };
 }
 
 export const knowledgeBase: HospitalInfo = {
@@ -25,27 +32,32 @@ export const knowledgeBase: HospitalInfo = {
     {
       name: "General Medicine",
       description: "Comprehensive primary healthcare, routine health check-ups, active screenings, preventive consultations, and management of chronic conditions (e.g., hypertension, diabetes).",
-      head: "Dr. Clara Winters, MD"
+      head: "Dr. Clara Winters, MD",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=300"
     },
     {
       name: "Pediatrics",
       description: "Compassionate, specialist medical tracking and curative services tailored for infants, children, and adolescents. Includes vaccinations, development monitoring, and childhood disease management.",
-      head: "Dr. Raymond Vance, MD"
+      head: "Dr. Raymond Vance, MD",
+      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=300"
     },
     {
       name: "Cardiology",
       description: "State-of-the-art cardiovascular health assessments, ECG, echocardiograms, blood pressure telemetry, heart murmur evaluations, and preventative care plans.",
-      head: "Dr. Marcus Sterling, FACC"
+      head: "Dr. Marcus Sterling, FACC",
+      image: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=300"
     },
     {
       name: "Orthopedics",
       description: "Expert skeletal and joint care, treatment for sports injuries, osteoporosis, fractures, arthritis management, and personalized physical rehabilitation advice.",
-      head: "Dr. Evelyn Brooks, MD"
+      head: "Dr. Evelyn Brooks, MD",
+      image: "https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=300"
     },
     {
       name: "Dermatology",
       description: "Clinical skin, hair, and nail treatments for conditions such as eczema, psoriasis, acne, early skin anomaly tracking, and advanced patch testing.",
-      head: "Dr. Jordan Mercer, MD"
+      head: "Dr. Jordan Mercer, MD",
+      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=300"
     }
   ],
   services: [
@@ -132,5 +144,12 @@ export const knowledgeBase: HospitalInfo = {
     email: "support@communityhealthcareportal.org",
     webAddress: "https://www.communityhealthcareportal.org",
     emergencyHotline: "+1 (555) 911-3000"
+  },
+  complaintInfo: {
+    department: "Patient Relations & Quality Coordination Department",
+    location: "First Floor, Central Atrium, Office Room 102 (adjacent to the Patient Serenity Lounge)",
+    email: "patient.relations@communityhealthcareportal.org",
+    phone: "+1 (555) 321-4321 (Extension 401)",
+    procedure: "Patients or volunteers can submit critical, administrative, or clinical service feedback/complaints by emailing patient.relations@communityhealthcareportal.org, calling +1 (555) 321-4321 Ext 401, or visiting the Office Room 102 in person. All submissions are thoroughly audited and resolved by our Administrative Council within 3-5 business days."
   }
 };

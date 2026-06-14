@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   CalendarDays,
@@ -8,16 +8,11 @@ import {
   Stethoscope,
   Send,
   Sparkles,
-  Bot,
   UserCheck,
-  AlertCircle,
-  HelpCircle,
-  Clock,
-  ArrowRight,
-  Info
+  AlertCircle
 } from "lucide-react";
 import { knowledgeBase } from "../data/knowledgeBase";
-import { sendChatMessage, generateConcernSummary, ChatMessage, SummarizeParams } from "../services/gemini";
+import { generateConcernSummary, SummarizeParams } from "../services/gemini";
 import MarkdownView from "../components/MarkdownView";
 
 export default function Appointment() {
@@ -39,24 +34,6 @@ export default function Appointment() {
     text: string;
     modelUsed: string;
   } | null>(null);
-
-  // Chatbot State
-  const [chatbotInput, setChatbotInput] = useState("");
-  const [chats, setChats] = useState<ChatMessage[]>([
-    {
-      role: "model",
-      text: "Hello! I am the Portal Support Assistant. Feel free to ask about our available medical departments, outpatient hours, facility locations, patient services, or our volunteer network!"
-    }
-  ]);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const [chatError, setChatError] = useState<string | null>(null);
-
-  const messageEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto scroll chat to bottom on new messages
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chats]);
 
   // Form Field Validation
   const validateForm = () => {
@@ -158,488 +135,307 @@ export default function Appointment() {
     setSummaryResult(null);
   };
 
-  // Chatbot logic
-  const handleChatSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const query = chatbotInput.trim();
-    if (!query) return;
-
-    // Append user message
-    const updatedChats = [...chats, { role: "user" as const, text: query }];
-    setChats(updatedChats);
-    setChatbotInput("");
-    setIsChatLoading(true);
-    setChatError(null);
-
-    try {
-      const response = await sendChatMessage(query, chats);
-      setChats((prev) => [...prev, { role: "model", text: response.text }]);
-    } catch (err: any) {
-      setChatError(err.message || "Failed to contact hospital assistant. Please try again.");
-    } finally {
-      setIsChatLoading(false);
-    }
-  };
-
-  // Quick Questions handler for instant interactive grounding
-  const handleQuickQuestionClick = async (question: string) => {
-    setChatbotInput("");
-    setIsChatLoading(true);
-    setChatError(null);
-
-    // Append user question
-    const updatedChats = [...chats, { role: "user" as const, text: question }];
-    setChats(updatedChats);
-
-    try {
-      const response = await sendChatMessage(question, chats);
-      setChats((prev) => [...prev, { role: "model", text: response.text }]);
-    } catch (err: any) {
-      setChatError(err.message || "Failed to contact assistant.");
-    } finally {
-      setIsChatLoading(false);
-    }
-  };
-
-  const suggestPrompts = [
-    "What are your outpatient (OPD) working hours?",
-    "Show me the available hospital departments & specialists",
-    "Where is the Patient Serenity Lounge located?",
-    "Tell me about the volunteer program commitment and benefits."
-  ];
-
   return (
-    <div className="space-y-12 pb-16 animate-fade-in" id="appointment-booking-root">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-16 pb-20 animate-fade-in text-stone-850" id="appointment-booking-root">
+      
       {/* Page header banner */}
       <section className="text-center space-y-4 max-w-3xl mx-auto banner-header">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Appointment Clinic & Support Assistant
+        <span className="text-xs font-extrabold text-fresh-green uppercase tracking-widest bg-emerald-50 px-3.5 py-1 rounded-full border border-fresh-green/20">
+          Outpatient Care Schedule
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-stone-900 tracking-tight mt-1.5 animate-fade-in">
+          Appointment Clinic Booking
         </h1>
-        <p className="text-slate-600 text-sm sm:text-base">
-          Submit your clinician appointment request below. While finalizing your details, feel free to ask our Portal Support Assistant questions about our offices, clinics, or operational hours.
+        <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+          Submit your clinician appointment request below. Our medical coordinator team will evaluate your clinic slots and verify details.
         </p>
       </section>
 
-      {/* Main layout splitting Booking form and Chatbot */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* LEFT COLUMN: Booking Form or Success Summary (7 cols) */}
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm min-h-[600px] flex flex-col justify-between">
-          <AnimatePresence mode="wait">
-            {!isFormSubmitted ? (
-              <motion.div
-                key="form-entry-view"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
-              >
-                <div className="border-b border-slate-100 pb-4 text-left">
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <CalendarDays className="h-5.5 w-5.5 text-emerald-600" />
-                    Patient Consultation Form
-                  </h2>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-1">
-                    Carefully input your vital details. Our hospital managers will coordinate appointment confirmation.
+      {/* Centered Patient Consultation Form Container */}
+      <div className="max-w-4xl mx-auto w-full bg-white p-6 sm:p-10 rounded-4xl border border-stone-200/60 shadow-lg shadow-stone-200/50 min-h-[580px] flex flex-col justify-between hover:border-fresh-green/35 transition-all duration-350">
+        <AnimatePresence mode="wait">
+          {!isFormSubmitted ? (
+            <motion.div
+              key="form-entry-view"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              <div className="border-b border-stone-100 pb-5 text-left">
+                <h2 className="text-xl font-display font-extrabold text-stone-900 flex items-center gap-2.5">
+                  <CalendarDays className="h-5.5 w-5.5 text-fresh-green" />
+                  Patient Consultation Form
+                </h2>
+                <p className="text-stone-500 text-xs sm:text-sm mt-1.5 font-medium leading-relaxed">
+                  Carefully input your vital details. Our hospital managers will coordinate appointment confirmation.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmitForm} className="space-y-5 text-left" noValidate id="consultation-booking-form">
+                {/* Name and Age row */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2 space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="name">
+                      Patient Full Name *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-stone-400" />
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className={`pl-11 w-full rounded-2xl border ${
+                          formErrors.name ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                        } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-800 bg-[#fdfdfc]`}
+                        placeholder="e.g. Jane Doe"
+                      />
+                    </div>
+                    {formErrors.name && (
+                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {formErrors.name}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="age">
+                      Patient Age *
+                    </label>
+                    <input
+                      id="age"
+                      name="age"
+                      type="number"
+                      min="1"
+                      max="120"
+                      value={formData.age}
+                      onChange={handleInputChange}
+                      className={`w-full rounded-2xl border ${
+                        formErrors.age ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                      } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-800 bg-[#fdfdfc]`}
+                      placeholder="e.g. 28"
+                    />
+                    {formErrors.age && (
+                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {formErrors.age}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone & Email row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="phone">
+                      Phone Number *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-stone-400" />
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className={`pl-11 w-full rounded-2xl border ${
+                          formErrors.phone ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                        } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-800 bg-[#fdfdfc]`}
+                        placeholder="e.g. (555) 000-1234"
+                      />
+                    </div>
+                    {formErrors.phone && (
+                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {formErrors.phone}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="email">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-stone-400" />
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`pl-11 w-full rounded-2xl border ${
+                          formErrors.email ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                        } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-800 bg-[#fdfdfc]`}
+                        placeholder="e.g. jdoe@example.com"
+                      />
+                    </div>
+                    {formErrors.email && (
+                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {formErrors.email}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Department & Date Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="department">
+                      Preferred Department *
+                    </label>
+                    <div className="relative">
+                      <Stethoscope className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-fresh-green" />
+                      <select
+                        id="department"
+                        name="department"
+                        value={formData.department}
+                        onChange={handleInputChange}
+                        className="pl-11 w-full rounded-2xl border border-stone-200 px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-fresh-green/20 focus:ring-opacity-40 bg-[#fdfdfc] font-bold text-stone-800 cursor-pointer"
+                      >
+                        {knowledgeBase.departments.map((dept, i) => (
+                           <option key={i} value={dept.name}>
+                             {dept.name}
+                           </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="date">
+                      Preferred Date *
+                    </label>
+                    <input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                      className={`w-full rounded-2xl border ${
+                        formErrors.date ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                      } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-800 bg-[#fdfdfc]`}
+                    />
+                    {formErrors.date && (
+                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        {formErrors.date}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Symptoms Concern */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="symptoms">
+                    Symptoms & Concerns *
+                  </label>
+                  <textarea
+                    id="symptoms"
+                    name="symptoms"
+                    rows={4}
+                    value={formData.symptoms}
+                    onChange={handleInputChange}
+                    className={`w-full rounded-2xl border ${
+                      formErrors.symptoms ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/15"
+                    } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium resize-none text-stone-850 bg-[#fdfdfc]`}
+                    placeholder="Please explicitly state physical symptoms, timeline, and intensity (e.g. mild shoulder tightness since 3 days)..."
+                  />
+                  <div className="flex justify-between items-center text-stone-400 text-[10px] pt-1 font-bold uppercase tracking-wider">
+                    <span>Minimum 10 characters</span>
+                    <span>{formData.symptoms.length} chars entered</span>
+                  </div>
+                  {formErrors.symptoms && (
+                    <span className="text-rose-500 text-xs font-semibold flex items-center gap-1.5 mt-1">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {formErrors.symptoms}
+                    </span>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  id="submit-appointment-btn"
+                  type="submit"
+                  disabled={isSubmittingForm}
+                  className="w-full flex items-center justify-center py-4 bg-fresh-green hover:bg-[#2E7D32] disabled:bg-stone-300 text-white rounded-2xl font-bold text-sm shadow-sm hover:shadow-md transition-all duration-200 gap-2 cursor-pointer active:scale-[0.99]"
+                >
+                  {isSubmittingForm ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <span>Compiling briefing and scheduling...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4.5 w-4.5 text-amber-100 animate-pulse" />
+                      <span>Book Clinic Slot & Compile Briefing</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          ) : (
+            // Success confirmation view with AI generated summary
+            <motion.div
+              key="success-summary-view"
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 15 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6 text-left"
+            >
+              <div className="bg-[#E8F5E9]/50 border border-fresh-green/20 rounded-3xl p-6 flex items-start gap-4">
+                <div className="p-3 bg-[#E8F5E9] rounded-2xl text-emerald-800 flex-shrink-0 border border-fresh-green/20">
+                  <UserCheck className="h-6 w-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-stone-900 font-display font-extrabold text-lg">Appointment Submitted Successfully!</h3>
+                  <p className="text-stone-600 text-sm leading-relaxed font-semibold">
+                    Thank you, **{formData.name}**. We've successfully received your booking. Our administrative clinicians have queued your appointment for evaluation.
                   </p>
                 </div>
-
-                <form onSubmit={handleSubmitForm} className="space-y-5 text-left" noValidate id="consultation-booking-form">
-                  {/* Name and Age row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="sm:col-span-2 space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="name">
-                        Patient Full Name *
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3.5 top-3 h-4.5 w-4.5 text-slate-400" />
-                        <input
-                          id="name"
-                          name="name"
-                          type="text"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className={`pl-10 w-full rounded-xl border ${
-                            formErrors.name ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                          } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
-                          placeholder="e.g. Jane Doe"
-                        />
-                      </div>
-                      {formErrors.name && (
-                        <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          {formErrors.name}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="age">
-                        Patient Age *
-                      </label>
-                      <input
-                        id="age"
-                        name="age"
-                        type="number"
-                        min="1"
-                        max="120"
-                        value={formData.age}
-                        onChange={handleInputChange}
-                        className={`w-full rounded-xl border ${
-                          formErrors.age ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                        } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
-                        placeholder="e.g. 28"
-                      />
-                      {formErrors.age && (
-                        <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          {formErrors.age}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Phone & Email row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="phone">
-                        Phone Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
-                        <input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className={`pl-10 w-full rounded-xl border ${
-                            formErrors.phone ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                          } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
-                          placeholder="e.g. (555) 000-1234"
-                        />
-                      </div>
-                      {formErrors.phone && (
-                        <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          {formErrors.phone}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="email">
-                        Email Address *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
-                        <input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className={`pl-10 w-full rounded-xl border ${
-                            formErrors.email ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                          } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
-                          placeholder="e.g. jdoe@example.com"
-                        />
-                      </div>
-                      {formErrors.email && (
-                        <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          {formErrors.email}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Department & Date Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="department">
-                        Preferred Medical Department *
-                      </label>
-                      <div className="relative">
-                        <Stethoscope className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-emerald-600" />
-                        <select
-                          id="department"
-                          name="department"
-                          value={formData.department}
-                          onChange={handleInputChange}
-                          className="pl-10 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-emerald-200 focus:ring-opacity-40 bg-white font-medium"
-                        >
-                          {knowledgeBase.departments.map((dept, i) => (
-                            <option key={i} value={dept.name}>
-                              {dept.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700" htmlFor="date">
-                        Preferred Appointment Date *
-                      </label>
-                      <input
-                        id="date"
-                        name="date"
-                        type="date"
-                        value={formData.date}
-                        onChange={handleInputChange}
-                        className={`w-full rounded-xl border ${
-                          formErrors.date ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                        } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
-                      />
-                      {formErrors.date && (
-                        <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
-                          {formErrors.date}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Symptoms Concern */}
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700" htmlFor="symptoms">
-                      Symptoms & Health Concerns *
-                    </label>
-                    <textarea
-                      id="symptoms"
-                      name="symptoms"
-                      rows={4}
-                      value={formData.symptoms}
-                      onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${
-                        formErrors.symptoms ? "border-rose-300 focus:ring-rose-200" : "border-slate-200 focus:ring-emerald-200"
-                      } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium resize-none`}
-                      placeholder="Please explicitly state physical symptoms, timeline, and intensity (e.g. mild shoulder tightness since 3 days after sleeping wrong)..."
-                    />
-                    <div className="flex justify-between items-center text-slate-400 text-xs pt-1">
-                      <span>Minimum 10 characters</span>
-                      <span>{formData.symptoms.length} chars entered</span>
-                    </div>
-                    {formErrors.symptoms && (
-                      <span className="text-rose-500 text-xs font-semibold flex items-center gap-1">
-                        <AlertCircle className="h-3.5 w-3.5" />
-                        {formErrors.symptoms}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    id="submit-appointment-btn"
-                    type="submit"
-                    disabled={isSubmittingForm}
-                    className="w-full flex items-center justify-center py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-350 text-white rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 gap-2 cursor-pointer"
-                  >
-                    {isSubmittingForm ? (
-                      <>
-                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span>Compiling briefing and scheduling...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4.5 w-4.5 text-emerald-200" />
-                        <span>Book Clinic Slot & Compile Briefing</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              </motion.div>
-            ) : (
-              // Success confirmation view with AI generated summary
-              <motion.div
-                key="success-summary-view"
-                initial={{ opacity: 0, y: -15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6 text-left"
-              >
-                <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
-                  <div className="p-3 bg-emerald-100 rounded-xl text-emerald-700 flex-shrink-0">
-                    <UserCheck className="h-6 w-6" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-emerald-950 font-extrabold text-lg">Appointment Submitted Successfully!</h3>
-                    <p className="text-emerald-800 text-sm leading-relaxed">
-                      Thank you, **{formData.name}**. We've successfully received your booking. Our administrative clinicians have queued your appointment for evaluation.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h4 className="font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                      <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
-                      Patient Clinical Briefing
-                    </h4>
-                    {summaryResult?.modelUsed !== "offline-rule-backup" && (
-                      <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-150">
-                        {summaryResult?.modelUsed || "gemini-2.5"}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="prose max-w-none text-sm leading-relaxed" id="ai-symptom-summarization-pnl">
-                    {summaryResult && <MarkdownView text={summaryResult.text} />}
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                  <button
-                    id="book-another-btn"
-                    onClick={handleResetForm}
-                    className="flex-1 py-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-bold transition-all duration-200 cursor-pointer text-center"
-                  >
-                    Schedule Another Consultation
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* RIGHT COLUMN: Chatbot widget (5 cols) */}
-        <div className="lg:col-span-5 bg-white border border-slate-100 shadow-sm rounded-3xl min-h-[600px] flex flex-col justify-between overflow-hidden">
-          
-          {/* Chatbot Header */}
-          <div className="bg-gradient-to-r from-emerald-800 to-teal-800 px-5 py-4 border-b border-emerald-900/10 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-white">
-              <div className="p-2 bg-white/10 rounded-xl">
-                <Bot className="h-5.5 w-5.5 text-emerald-200" />
               </div>
-              <div className="text-left">
-                <h3 className="font-bold text-sm tracking-tight">Portal Support Assistant</h3>
-                <p className="text-[10px] text-emerald-200/90 font-medium">Portal Search Assistant</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-900/30 rounded-full text-[10px] text-emerald-250 font-bold border border-emerald-700">
-              ● Online
-            </span>
-          </div>
 
-          <div className="p-4 bg-emerald-50/40 text-left border-b border-emerald-150/40">
-            <p className="text-[11px] text-emerald-900 leading-tight flex items-start gap-1.5 font-medium">
-              <Info className="h-3.5 w-3.5 text-emerald-700 flex-shrink-0 mt-0.5" />
-              <span>
-                <strong>Note:</strong> This assistant is programmed to answer general inquiries regarding hospital services, hours, locations, and procedures. It does not provide medical diagnoses or treatment prescriptions.
-              </span>
-            </p>
-          </div>
-
-          {/* Chat History Panel */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[380px] min-h-[280px] bg-slate-50/40 text-left">
-            <AnimatePresence initial={false}>
-              {chats.map((msg, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.18 }}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-slate-800 text-white shadow-xs rounded-tr-none"
-                        : "bg-white text-slate-800 border border-slate-150 shadow-xs rounded-tl-none pr-3"
-                    }`}
-                  >
-                    {msg.role === "model" ? (
-                      <div className="prose text-xs sm:text-sm">
-                        <MarkdownView text={msg.text} />
-                      </div>
-                    ) : (
-                      <p>{msg.text}</p>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-
-              {isChatLoading && (
-                <motion.div
-                  key="chat-loader"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-white rounded-2xl rounded-tl-none pr-5 pl-4 py-3 border border-slate-150 shadow-xs flex items-center gap-2">
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <div className="border border-stone-200 bg-stone-50 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between border-b border-stone-250 pb-3.5">
+                  <h4 className="font-display font-extrabold text-stone-900 tracking-tight flex items-center gap-2">
+                    <Sparkles className="h-4.5 w-4.5 text-fresh-green animate-pulse" />
+                    Patient Clinical Briefing
+                  </h4>
+                  {summaryResult?.modelUsed !== "offline-rule-backup" && (
+                    <span className="text-[10px] font-mono text-fresh-green bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-fresh-green/20 font-bold">
+                      {summaryResult?.modelUsed || "gemini-2.1"}
                     </span>
-                    <span className="text-xs text-slate-500 font-medium">Assistant is retrieving information...</span>
-                  </div>
-                </motion.div>
-              )}
+                  )}
+                </div>
 
-              {chatError && (
-                <motion.div
-                  key="chat-error-log"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs flex items-start gap-2"
-                >
-                  <AlertCircle className="h-4 w-4 text-rose-600 flex-shrink-0 mt-0.5" />
-                  <div>{chatError}</div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div ref={messageEndRef} />
-          </div>
+                <div className="prose max-w-none text-xs sm:text-sm leading-relaxed text-stone-700" id="ai-symptom-summarization-pnl">
+                  {summaryResult && <MarkdownView text={summaryResult.text} />}
+                </div>
+              </div>
 
-          {/* Quick Grounded Prompts selection box */}
-          <div className="p-3 bg-white border-t border-slate-100 text-left space-y-1.5">
-            <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
-              <HelpCircle className="h-3 w-3" />
-              Suggested Knowledge Queries:
-            </span>
-            <div className="flex flex-wrap gap-1.5 max-h-[85px] overflow-y-auto pt-0.5">
-              {suggestPrompts.map((q, idx) => (
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <button
-                  key={idx}
-                  onClick={() => handleQuickQuestionClick(q)}
-                  disabled={isChatLoading}
-                  className="text-[10px] sm:text-xs text-emerald-800 hover:text-white bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 hover:border-emerald-600 rounded-lg px-2.5 py-1.5 transition-all text-left font-semibold active:scale-95 duration-200 disabled:opacity-50 cursor-pointer"
+                  id="book-another-btn"
+                  onClick={handleResetForm}
+                  className="flex-1 py-3.5 bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 rounded-2xl font-bold transition-all duration-200 cursor-pointer text-center text-sm"
                 >
-                  {q}
+                  Schedule Another Consultation
                 </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Chat input box */}
-          <form onSubmit={handleChatSubmit} className="p-3 border-t border-slate-100 bg-slate-50 flex items-center gap-2">
-            <input
-              type="text"
-              value={chatbotInput}
-              onChange={(e) => setChatbotInput(e.target.value)}
-              disabled={isChatLoading}
-              placeholder="Ask hours, departments, volunteering details..."
-              className="flex-1 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs sm:text-sm bg-white outline-none focus:border-emerald-500 focus:ring-3 focus:ring-emerald-250 focus:ring-opacity-40 transition-all font-medium"
-            />
-            <button
-              id="send-chat-message-btn"
-              type="submit"
-              disabled={isChatLoading || !chatbotInput.trim()}
-              className="p-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-350 text-white rounded-xl transition-all duration-200 cursor-pointer flex-shrink-0 shadow-xs"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
-
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
     </div>
   );
 }

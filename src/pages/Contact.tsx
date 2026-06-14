@@ -77,61 +77,65 @@ export default function Contact() {
   };
 
   return (
-    <div className="space-y-12 pb-16 animate-fade-in" id="contact-page-root">
+    <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-16 pb-20 animate-fade-in text-stone-850" id="contact-page-root">
+      
       {/* Page Header banner */}
       <section className="text-center space-y-4 max-w-3xl mx-auto banner-header">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <span className="text-xs font-extrabold text-fresh-green uppercase tracking-widest bg-emerald-50 px-3.5 py-1 rounded-full border border-fresh-green/20">
+          Inquiries Desk
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-stone-900 tracking-tight mt-1.5 animate-fade-in">
           Get in Touch With Us
         </h1>
-        <p className="text-slate-600 text-sm sm:text-base">
+        <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
           Do you have general, non-clinical questions about community events, our volunteer roster, or specialist schedules? Drop us a line below, or stop by during OPD hours.
         </p>
       </section>
 
       {/* Main split: Cards on left, Contact Form on right */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         
         {/* LEFT COLUMN: Contact particulars & Working hours (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           
           {/* Direct Address & Contacts details */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm text-left space-y-6">
-            <h3 className="font-extrabold text-lg text-slate-900 border-b border-slate-100 pb-3">
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/60 shadow-md text-left space-y-6 hover:border-fresh-green/35 transition-colors">
+            <h3 className="font-display font-extrabold text-lg text-stone-900 border-b border-stone-100 pb-3">
               Hospital Contact Directory
             </h3>
 
             <div className="space-y-4.5">
               <div className="flex gap-3.5 items-start">
-                <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 flex-shrink-0">
+                <div className="p-2.5 bg-[#E8F5E9] rounded-xl text-fresh-green flex-shrink-0 border border-fresh-green/15 shadow-xs">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Physical Address</h4>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-1 leading-relaxed">
+                  <h4 className="font-display font-bold text-stone-900 text-sm">Physical Address</h4>
+                  <p className="text-stone-500 text-xs sm:text-sm mt-1 leading-relaxed">
                     {knowledgeBase.contactInfo.address}
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3.5 items-start">
-                <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 flex-shrink-0">
+                <div className="p-2.5 bg-[#E8F5E9] rounded-xl text-fresh-green flex-shrink-0 border border-fresh-green/15 shadow-xs">
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Phone Line</h4>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium">
+                  <h4 className="font-display font-bold text-stone-900 text-sm">Phone Line</h4>
+                  <p className="text-stone-550 text-xs sm:text-sm mt-0.5 font-bold">
                     {knowledgeBase.contactInfo.phone}
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-3.5 items-start">
-                <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 flex-shrink-0">
+                <div className="p-2.5 bg-[#E8F5E9] rounded-xl text-fresh-green flex-shrink-0 border border-fresh-green/15 shadow-xs">
                   <Mail className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-sm">Email Coordination</h4>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-0.5 font-medium break-all">
+                  <h4 className="font-display font-bold text-stone-900 text-sm">Email Coordination</h4>
+                  <p className="text-stone-550 text-xs sm:text-sm mt-0.5 font-bold break-all">
                     {knowledgeBase.contactInfo.email}
                   </p>
                 </div>
@@ -139,37 +143,37 @@ export default function Contact() {
             </div>
 
             {/* Emergency Warn block */}
-            <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex gap-3 text-left">
-              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="p-4 bg-[#FFF3E0] border border-orange-accent/25 rounded-2xl flex gap-3 text-left">
+              <AlertCircle className="h-5 w-5 text-orange-accent flex-shrink-0 mt-0.5" />
               <div>
-                <h5 className="font-bold text-amber-900 text-xs">Health Emergency Hotline</h5>
-                <p className="text-[11px] text-amber-800 mt-0.5 leading-normal">
-                  Our web channels must never be used for severe trauma or distress. In clinical emergencies, call **911** or our hospital dispatch line: <br />
-                  <span className="font-bold text-amber-950 text-xs">{knowledgeBase.contactInfo.emergencyHotline}</span>
+                <h5 className="font-bold text-[#E65100] text-xs uppercase tracking-wider">Health Emergency Hotline</h5>
+                <p className="text-[11px] text-stone-600 mt-1 leading-relaxed font-semibold">
+                  This portal must never be used for severe medical emergencies. In clinical emergencies, call **911** or our hospital dispatch line immediately: <br />
+                  <span className="font-extrabold text-stone-900 text-xs mt-1 block">{knowledgeBase.contactInfo.emergencyHotline}</span>
                 </p>
               </div>
             </div>
           </div>
 
           {/* Working hours cards */}
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm text-left space-y-4">
-            <h3 className="font-extrabold text-lg text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-              <Clock className="h-5 w-5 text-emerald-600" />
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/60 shadow-md text-left space-y-4 hover:border-orange-accent/35 transition-colors">
+            <h3 className="font-display font-extrabold text-lg text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+              <Clock className="h-5 w-5 text-orange-accent" />
               Operational Calendar
             </h3>
             
-            <div className="space-y-3 pt-1">
+            <div className="space-y-4 pt-1">
               {knowledgeBase.workingHours.map((wh, idx) => (
-                <div key={idx} className="space-y-1">
-                  <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-800">
-                    <span>{wh.days}</span>
-                    <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px] sm:text-xs">
+                <div key={idx} className="space-y-1.5">
+                  <div className="flex justify-between items-center text-xs sm:text-sm font-extrabold text-stone-900">
+                    <span className="font-display">{wh.days}</span>
+                    <span className="text-[#2E7D32] bg-[#E8F5E9] px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold border border-fresh-green/20">
                       {wh.hours}
                     </span>
                   </div>
-                  <p className="text-slate-400 text-[11px] sm:text-xs">{wh.notes}</p>
+                  <p className="text-stone-400 text-[11px] sm:text-xs font-semibold leading-relaxed">{wh.notes}</p>
                   {idx < knowledgeBase.workingHours.length - 1 && (
-                    <hr className="border-t border-slate-50 mt-2" />
+                    <hr className="border-t border-stone-50 mt-2" />
                   )}
                 </div>
               ))}
@@ -179,30 +183,30 @@ export default function Contact() {
         </div>
 
         {/* RIGHT COLUMN: Contact message Form (7 cols) */}
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm min-h-[500px] flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white p-6 sm:p-10 rounded-3xl border border-stone-200/60 shadow-md shadow-stone-200/50 min-h-[500px] flex flex-col justify-between hover:border-fresh-green/35 transition-colors duration-350">
           <AnimatePresence mode="wait">
             {!isSubmitted ? (
               <motion.div
                 key="contact-form-entry"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <div className="border-b border-slate-100 pb-4 text-left">
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <Mail className="h-5.5 w-5.5 text-emerald-600" />
+                <div className="border-b border-stone-100 pb-5 text-left">
+                  <h2 className="text-xl font-display font-extrabold text-stone-900 flex items-center gap-2.5">
+                    <Mail className="h-5.5 w-5.5 text-fresh-green" />
                     Drop Us a Message
                   </h2>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
-                    Do you have questions or want to collaborate with our NGO? Send a message and we'll reply shortly.
+                  <p className="text-stone-500 text-xs sm:text-sm mt-1.5 font-medium leading-relaxed">
+                    Do you have questions or want to collaborate with our outpatient NGO coordinators? Send a message and we'll reply shortly.
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5 text-left" noValidate id="contact-inquiry-form">
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700" htmlFor="name">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="name">
                       fullName *
                     </label>
                     <input
@@ -211,9 +215,9 @@ export default function Contact() {
                       type="text"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${
-                        formErrors.name ? "border-rose-300 focus:ring-rose-250" : "border-slate-200 focus:ring-emerald-250"
-                      } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
+                      className={`w-full rounded-2xl border ${
+                        formErrors.name ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                      } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-850 bg-[#fdfdfc]`}
                       placeholder="e.g. Richard Lovelace"
                     />
                     {formErrors.name && (
@@ -225,7 +229,7 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700" htmlFor="email">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="email">
                       your Email Address *
                     </label>
                     <input
@@ -234,9 +238,9 @@ export default function Contact() {
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${
-                        formErrors.email ? "border-rose-300 focus:ring-rose-250" : "border-slate-200 focus:ring-emerald-250"
-                      } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium`}
+                      className={`w-full rounded-2xl border ${
+                        formErrors.email ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/20"
+                      } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium text-stone-900 bg-[#fdfdfc]`}
                       placeholder="e.g. richard@lovelace.org"
                     />
                     {formErrors.email && (
@@ -248,7 +252,7 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700" htmlFor="message">
+                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-widest" htmlFor="message">
                       your Message *
                     </label>
                     <textarea
@@ -257,9 +261,9 @@ export default function Contact() {
                       rows={5}
                       value={formData.message}
                       onChange={handleInputChange}
-                      className={`w-full rounded-xl border ${
-                        formErrors.message ? "border-rose-300 focus:ring-rose-250" : "border-slate-200 focus:ring-emerald-250"
-                      } px-3.5 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-3 focus:ring-opacity-40 transition-all font-medium resize-none`}
+                      className={`w-full rounded-2xl border ${
+                        formErrors.message ? "border-rose-300 focus:ring-rose-200" : "border-stone-200 focus:ring-fresh-green/15"
+                      } px-3.5 py-3 text-sm outline-none focus:border-fresh-green focus:ring-4 focus:ring-opacity-40 transition-all font-medium resize-none text-stone-850 bg-[#fdfdfc]`}
                       placeholder="Type the full contents of your query here..."
                     />
                     {formErrors.message && (
@@ -274,7 +278,7 @@ export default function Contact() {
                     id="submit-contact-btn"
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full flex items-center justify-center py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-350 text-white rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 gap-2 cursor-pointer"
+                    className="w-full flex items-center justify-center py-4 bg-fresh-green hover:bg-[#2E7D32] disabled:bg-stone-300 text-white rounded-2xl font-bold transition-all duration-200 gap-2 cursor-pointer shadow-sm text-sm"
                   >
                     {isSubmitting ? (
                       <>
@@ -286,7 +290,7 @@ export default function Contact() {
                       </>
                     ) : (
                       <>
-                        <Send className="h-4 w-4" />
+                        <Send className="h-4.5 w-4.5" />
                         <span>Send Message</span>
                       </>
                     )}
@@ -303,22 +307,22 @@ export default function Contact() {
                 transition={{ duration: 0.25 }}
                 className="my-auto space-y-6 text-center py-10"
               >
-                <div className="mx-auto p-4 bg-emerald-50 text-emerald-600 rounded-full w-16 h-16 flex items-center justify-center border border-emerald-100 shadow-sm animate-bounce">
-                  <CheckCircle2 className="h-10 w-10" />
+                <div className="mx-auto p-4 bg-[#E8F5E9] text-fresh-green rounded-full w-16 h-16 flex items-center justify-center border border-fresh-green/20 shadow-sm animate-fade-in">
+                  <CheckCircle2 className="h-10 w-10 text-fresh-green" />
                 </div>
                 <div className="space-y-3 max-w-md mx-auto">
-                  <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Message Dispatched!</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <h3 className="text-2xl font-display font-extrabold text-stone-900 tracking-tight">Message Dispatched!</h3>
+                  <p className="text-sm text-stone-600 leading-relaxed font-semibold">
                     Thank you, **{formData.name}**! Your non-clinical general inquiry has been received by our office team.
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-stone-500 bg-[#E8F5E9]/50 p-4 border border-fresh-green/20 rounded-2xl">
                     We will coordinate an answer back to your email at **{formData.email}** within 24 hours.
                   </p>
                 </div>
                 <button
                   id="reset-contact-btn"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl font-bold transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 rounded-2xl font-bold transition-all duration-200 cursor-pointer text-sm"
                 >
                   Return to Form
                 </button>

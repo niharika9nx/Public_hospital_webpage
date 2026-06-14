@@ -143,6 +143,27 @@ export function retrieveContext(query: string): string {
     matchedChunks.push(`Emergency Clinical Hotline: ${knowledgeBase.contactInfo.emergencyHotline}`);
   }
 
+  // Check complaint questions
+  if (
+    queryLower.includes("complaint") ||
+    queryLower.includes("complain") ||
+    queryLower.includes("grievance") ||
+    queryLower.includes("dispute") ||
+    queryLower.includes("feedback") ||
+    queryLower.includes("unhappy") ||
+    queryLower.includes("issue") ||
+    queryLower.includes("report problem")
+  ) {
+    matchedChunks.push(
+      `How and Where to Report Complaints and Feedback:\n` +
+      `- Responsible Department: ${knowledgeBase.complaintInfo.department}\n` +
+      `- Office Location: ${knowledgeBase.complaintInfo.location}\n` +
+      `- Email Address: ${knowledgeBase.complaintInfo.email}\n` +
+      `- Direct Phone Line: ${knowledgeBase.complaintInfo.phone}\n` +
+      `- Standard Procedure: ${knowledgeBase.complaintInfo.procedure}`
+    );
+  }
+
   // Check appointment booking/process questions
   if (
     queryLower.includes("appointment") ||
